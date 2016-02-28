@@ -3,17 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_bottom_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_top_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="io.magics.throwremote.MainActivity">
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageButton2"
-        android:background="@drawable/ic_play_circle_outline_64dp"
+        android:background="@drawable/ic_pause_circle_outline_64dp"
         android:scaleType="fitXY"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true" />
@@ -38,7 +38,7 @@
         android:background="@drawable/ic_fast_forward_64dp"
         android:scaleType="fitXY" />
 
-    <ImageButton
+    ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageButton6"
@@ -57,7 +57,7 @@
         android:layout_marginBottom="2dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        />
+        android:max="100" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -68,9 +68,9 @@
         android:layout_marginBottom="4dp"
         android:scaleType="centerInside"
         android:cropToPadding="true"
-        android:src="@drawable/samplecover" />
+        android:src="@drawable/ic_cloud_off_256dp" />
 
-    <ImageButton
+    ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageButton4"
@@ -84,9 +84,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="00:00:00"
+        android:text="@string/zero_time"
         android:id="@+id/textView"
-        android:layout_above="@id/imageButton4"
+        android:layout_above="@+id/imageButton3"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -94,9 +94,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="80:08:13"
+        android:text="@string/zero_time"
         android:id="@+id/textView2"
-        android:layout_above="@+id/imageButton6"
+        android:layout_above="@+id/imageButton5"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
@@ -104,11 +104,41 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="The Walking Dead S01E01"
+        android:text="@string/disconnected"
         android:id="@+id/textView3"
         android:layout_above="@+id/seekBar2"
         android:layout_marginBottom="4dp"
         android:singleLine="true"
         android:textStyle="bold"
         android:gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/prompt"
+        android:id="@+id/textView4"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButton4"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/imageButton5"
+        android:layout_toEndOf="@+id/imageButton5"
+        android:background="@drawable/ic_volume_up_64dp" />
+
+    <StackView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/stackView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="309dp"
+        android:layout_marginStart="309dp" />
+
 </RelativeLayout>
