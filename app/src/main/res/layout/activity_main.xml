@@ -57,7 +57,7 @@
         android:layout_marginBottom="2dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:max="100" />
+        android:max="10000" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -140,5 +140,14 @@
         android:layout_alignParentStart="true"
         android:layout_marginLeft="309dp"
         android:layout_marginStart="309dp" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButton7"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/imageButton3"
+        android:layout_toStartOf="@+id/imageButton3"
+        android:background="@drawable/ic_stop_64dp" />
 
 </RelativeLayout>
