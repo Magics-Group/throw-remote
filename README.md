@@ -3,6 +3,7 @@ Android remote control for [Throw streaming media player](https://github.com/Mag
 
 ##Warning
 This was written by myself (with the rest of my team working on the player) during nwHacks, a 24-hour hackathon in Vancouver, Canada. As such, it is a burning pile of shit, fuelled by caffeine, pizza, bad decisions and broken dreams. I take no responsibility for any harm that may come to you or others as a result of this hack. ___Seriously.___
+![itcrowd](http://i.imgur.com/Bf48s8R.gif)
 ![Shit's on fire, yo](https://i.imgur.com/6NfmQ.jpg)
 
 Our lead developer, [@luigiplr](https://github.com/luigiplr) of PopcornTime fame (read: lawsuits), tried to persuade the judges that the project was called Throw because it could "handle anything you **Throw** at it." While I was not involved in the naming, I suspect it may have had more to do with the way this project was **Throw**n together. 
