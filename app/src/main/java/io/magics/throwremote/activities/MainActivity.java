@@ -1,4 +1,4 @@
- package io.magics.throwremote;
+ package io.magics.throwremote.activities;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -20,6 +20,8 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.magics.throwremote.R;
+import io.magics.throwremote.Stream;
 import io.magics.throwremote.listeners.EndedListener;
 import io.magics.throwremote.listeners.LengthUpdateListener;
 import io.magics.throwremote.listeners.MuteToggleListener;
@@ -31,23 +33,21 @@ import io.magics.throwremote.listeners.TitleUpdateListener;
 
  public class MainActivity extends AppCompatActivity {
 
-    //UI Elements
-    private SeekBar mSeekbar;
-    private TextView mTimeTextView;
-    private TextView mLengthTextView;
-    private TextView mTitleTextView;
-    private ImageButton mPlayImageButton;
-    private ImageButton mMuteImageButton;
-    private ImageButton mForwardImageButton;
-    private ImageButton mBackwardImageButton;
-    private ImageButton mStopButton;
-    private ImageView mImageView;
+     //UI Elements
+     private SeekBar mSeekbar;
+     private TextView mTimeTextView;
+     private TextView mLengthTextView;
+     private TextView mTitleTextView;
+     private ImageButton mPlayImageButton;
+     private ImageButton mMuteImageButton;
+     private ImageButton mForwardImageButton;
+     private ImageButton mBackwardImageButton;
+     private ImageButton mStopButton;
+     private ImageView mImageView;
 
-    //Other globals
-    private int mPosition;
-    private Socket mSocket;
-    private Boolean mMuted;
-    private Boolean mPlaying;
+     //other shit
+     private Stream mStream;
+     private Socket mSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +65,7 @@ import io.magics.throwremote.listeners.TitleUpdateListener;
         mBackwardImageButton = (ImageButton) findViewById(R.id.imageButton3);
         mStopButton = (ImageButton) findViewById(R.id.imageButton7);
         mImageView = (ImageView) findViewById(R.id.imageView);
-
-        mPosition = 0;
-        mMuted = false;
-        mPlaying = true;
+        mStream = new Stream();
 
         /*mSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -92,12 +89,12 @@ import io.magics.throwremote.listeners.TitleUpdateListener;
         mPlayImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPlaying = !mPlaying;
-                mSocket.emit("playing", mPlaying);
+                mStream.playing = !mStream.playing;
+                mSocket.emit("playing", mStream.playing);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (mPlaying) {
+                        if (mStream.playing) {
                             mPlayImageButton.setBackgroundResource(R.drawable.ic_pause_circle_outline_64dp);
                             Log.i("pause","pause");
                         } else {
@@ -113,12 +110,12 @@ import io.magics.throwremote.listeners.TitleUpdateListener;
         mMuteImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMuted = !mMuted;
-                mSocket.emit("muted", mMuted);
+                mStream.muted = !mStream.muted;
+                mSocket.emit("muted", mStream.muted);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (mMuted) {
+                        if (mStream.muted) {
                             mMuteImageButton.setBackgroundResource(R.drawable.ic_volume_off_64dp);
                         } else {
                             mMuteImageButton.setBackgroundResource(R.drawable.ic_volume_up_64dp);
@@ -131,7 +128,7 @@ import io.magics.throwremote.listeners.TitleUpdateListener;
         mForwardImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                double percent = mPosition / 10000.0;
+                double percent = mStream.position / 10000.0;
                 Log.i("percent", String.valueOf(percent));
                 mSocket.emit("forward", percent);
             }
@@ -140,7 +137,7 @@ import io.magics.throwremote.listeners.TitleUpdateListener;
         mBackwardImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                double percent = mPosition / 10000.0;
+                double percent = mStream.position / 10000.0;
                 Log.i("percent", String.valueOf(percent));
                 mSocket.emit("backward", percent);
             }
@@ -150,6 +147,7 @@ import io.magics.throwremote.listeners.TitleUpdateListener;
             @Override
             public void onClick(View v) {
                 Log.i("end", "end");
+                //TODO
                 mSocket.emit("ended");
             }
         });
@@ -231,13 +229,13 @@ import io.magics.throwremote.listeners.TitleUpdateListener;
                         mSocket = IO.socket(uri);
                         mSocket.connect();
                         mSocket.emit("pin", pin);
-                        mSocket.on("title", new TitleUpdateListener(MainActivity.this, "", mTitleTextView));
-                        mSocket.on("length", new LengthUpdateListener(MainActivity.this, 0, mLengthTextView));
-                        mSocket.on("position", new PositionUpdateListener(MainActivity.this, mPosition, mSeekbar));
-                        mSocket.on("time", new TimeUpdateListener(MainActivity.this, 0, mTimeTextView));
-                        mSocket.on("playing", new PlayToggleListener(MainActivity.this, mPlaying, mPlayImageButton));
-                        mSocket.on("muted", new MuteToggleListener(MainActivity.this, mMuted, mMuteImageButton));
-                        mSocket.on("ended", new EndedListener(MainActivity.this, false, mImageView));
+                        mSocket.on("title", new TitleUpdateListener(MainActivity.this, mStream.title, mTitleTextView));
+                        mSocket.on("length", new LengthUpdateListener(MainActivity.this, mStream.length, mLengthTextView));
+                        mSocket.on("position", new PositionUpdateListener(MainActivity.this, mStream.position, mSeekbar));
+                        mSocket.on("time", new TimeUpdateListener(MainActivity.this, mStream.time, mTimeTextView));
+                        mSocket.on("playing", new PlayToggleListener(MainActivity.this, mStream.playing, mPlayImageButton));
+                        mSocket.on("muted", new MuteToggleListener(MainActivity.this, mStream.muted, mMuteImageButton));
+                        mSocket.on("ended", new EndedListener(MainActivity.this, mStream.ended, mImageView));
 
                         runOnUiThread(new Runnable() {
                             @Override

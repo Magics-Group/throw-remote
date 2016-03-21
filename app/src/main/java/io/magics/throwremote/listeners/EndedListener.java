@@ -6,7 +6,6 @@ import android.widget.ImageView;
 
 import com.github.nkzawa.emitter.Emitter;
 
-import io.magics.throwremote.MainActivity;
 import io.magics.throwremote.R;
 
 public class EndedListener implements Emitter.Listener{
