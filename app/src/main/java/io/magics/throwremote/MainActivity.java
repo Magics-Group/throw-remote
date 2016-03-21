@@ -1,4 +1,4 @@
-package io.magics.throwremote;
+ package io.magics.throwremote;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -14,40 +14,47 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
-import java.net.URISyntaxException;
-import java.lang.Math;
-import java.util.concurrent.TimeUnit;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.magics.throwremote.listeners.EndedListener;
+import io.magics.throwremote.listeners.LengthUpdateListener;
+import io.magics.throwremote.listeners.MuteToggleListener;
+import io.magics.throwremote.listeners.PlayToggleListener;
+import io.magics.throwremote.listeners.PositionUpdateListener;
+import io.magics.throwremote.listeners.TimeUpdateListener;
+import io.magics.throwremote.listeners.TitleUpdateListener;
 
-public class MainActivity extends AppCompatActivity {
+
+ public class MainActivity extends AppCompatActivity {
+
+    //UI Elements
     private SeekBar mSeekbar;
-    private int mPositionValue;
     private TextView mTimeTextView;
     private TextView mLengthTextView;
     private TextView mTitleTextView;
     private ImageButton mPlayImageButton;
-    private Boolean mPlaying;
     private ImageButton mMuteImageButton;
-    private Boolean mMuted;
     private ImageButton mForwardImageButton;
     private ImageButton mBackwardImageButton;
     private ImageButton mStopButton;
     private ImageView mImageView;
+
+    //Other globals
+    private int mPosition;
     private Socket mSocket;
+    private Boolean mMuted;
+    private Boolean mPlaying;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Initialize all the shit
         mSeekbar = (SeekBar) findViewById(R.id.seekBar2);
         mTimeTextView = (TextView) findViewById(R.id.textView);
         mLengthTextView = (TextView) findViewById(R.id.textView2);
@@ -59,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         mStopButton = (ImageButton) findViewById(R.id.imageButton7);
         mImageView = (ImageView) findViewById(R.id.imageView);
 
-        mPositionValue = 0;
+        mPosition = 0;
         mMuted = false;
         mPlaying = true;
 
@@ -81,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
 
-
+        //Buttons
         mPlayImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         mForwardImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                double percent = mPositionValue / 10000.0;
+                double percent = mPosition / 10000.0;
                 Log.i("percent", String.valueOf(percent));
                 mSocket.emit("forward", percent);
             }
@@ -133,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         mBackwardImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                double percent = mPositionValue / 10000.0;
+                double percent = mPosition / 10000.0;
                 Log.i("percent", String.valueOf(percent));
                 mSocket.emit("backward", percent);
             }
@@ -158,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
+        // Actionbar Menu Items
         Intent intent;
         switch (item.getItemId()) {
             case R.id.action_settings:
@@ -211,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 String json = data.getStringExtra("SCAN_RESULT");
                 try {
+                    //Parse json from qr code
                     JSONObject jsonObj = new JSONObject(json);
                     String ip = jsonObj.getString("ip");
                     int port = jsonObj.getInt("port");
@@ -219,16 +227,17 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("uri", uri);
                     Log.i("pin", String.valueOf(pin));
                     try {
+                        //set up all the websockets
                         mSocket = IO.socket(uri);
                         mSocket.connect();
                         mSocket.emit("pin", pin);
-                        mSocket.on("title", onTitleUpdate);
-                        mSocket.on("length", onLengthUpdate);
-                        mSocket.on("position", onPositionUpdate);
-                        mSocket.on("time", onTimeUpdate);
-                        mSocket.on("playing", onPlayToggle);
-                        mSocket.on("muted", onMuteToggle);
-                        mSocket.on("ended", onEnded);
+                        mSocket.on("title", new TitleUpdateListener(MainActivity.this, "", mTitleTextView));
+                        mSocket.on("length", new LengthUpdateListener(MainActivity.this, 0, mLengthTextView));
+                        mSocket.on("position", new PositionUpdateListener(MainActivity.this, mPosition, mSeekbar));
+                        mSocket.on("time", new TimeUpdateListener(MainActivity.this, 0, mTimeTextView));
+                        mSocket.on("playing", new PlayToggleListener(MainActivity.this, mPlaying, mPlayImageButton));
+                        mSocket.on("muted", new MuteToggleListener(MainActivity.this, mMuted, mMuteImageButton));
+                        mSocket.on("ended", new EndedListener(MainActivity.this, false, mImageView));
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -246,118 +255,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Emitter.Listener onTitleUpdate = new Emitter.Listener() {
-        @Override
-        public void call(Object ... args) {
-            final String title = (String) args[0];
-            Log.i("title", title);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mTitleTextView.setText(title);
-                }
-            });
-        }
-    };
-
-    private Emitter.Listener onLengthUpdate = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            Integer length = (Integer) args[0];
-            Log.i("length", length.toString());
-            final String dateFormatted = String.format("%02d:%02d:%02d",
-                    TimeUnit.MILLISECONDS.toHours(length),
-                    TimeUnit.MILLISECONDS.toMinutes(length) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(length)),
-                    TimeUnit.MILLISECONDS.toSeconds(length) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(length)));
-            Log.i("length", dateFormatted);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mLengthTextView.setText(dateFormatted);
-                }
-            });
-        }
-    };
-
-    private Emitter.Listener onPositionUpdate = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            Double position = (Double) args[0];
-            //Log.i("position", position.toString());
-            mPositionValue = (int) Math.round(position * 10000);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSeekbar.setProgress(mPositionValue);
-                }
-            });
-        }
-    };
-
-    private Emitter.Listener onTimeUpdate = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            Integer time = (Integer) args[0];
-            //Log.i("time", time.toString());
-            final String dateFormatted = String.format("%02d:%02d:%02d",
-                    TimeUnit.MILLISECONDS.toHours(time),
-                    TimeUnit.MILLISECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(time)),
-                    TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time)));
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mTimeTextView.setText(dateFormatted);
-                }
-            });
-        }
-    };
-
-    private Emitter.Listener onPlayToggle = new Emitter.Listener() {
-        @Override
-        public void call (Object... args) {
-            mPlaying = (Boolean) args[0];
-            Log.i("playing", mPlaying.toString());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (mPlaying) {
-                        mPlayImageButton.setBackgroundResource(R.drawable.ic_pause_circle_outline_64dp);
-                    } else {
-                        mPlayImageButton.setBackgroundResource(R.drawable.ic_play_circle_outline_64dp);
-                    }
-                }
-            });
-        }
-    };
-
-    private Emitter.Listener onMuteToggle = new Emitter.Listener() {
-        @Override
-        public void call (Object... args) {
-            mMuted = (Boolean) args[0];
-            Log.i("muted", mMuted.toString());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (mMuted) {
-                        mMuteImageButton.setBackgroundResource(R.drawable.ic_volume_off_64dp);
-                    } else {
-                        mMuteImageButton.setBackgroundResource(R.drawable.ic_volume_up_64dp);
-                    }
-                }
-            });
-        }
-    };
-
-    private Emitter.Listener onEnded = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mImageView.setImageResource(R.drawable.ic_cloud_off_256dp);
-                }
-            });
-            Log.i("ended", "ended");
-        }
-    };
 }
