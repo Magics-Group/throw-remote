@@ -10,8 +10,9 @@ Our lead developer, [@luigiplr](https://github.com/luigiplr) of PopcornTime fame
 
 Now that that's out of the way, you probably want to see how it works.
 
-![remote-needs-qr](http://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/357/082/datas/gallery.jpg)
-![client-has-qr](http://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/356/713/datas/gallery.jpg)
+
+<img alt="remote needs qr" src="http://i.imgur.com/M0fVPNT.png"/>
+<img alt="client has qr" src="http://i.imgur.com/sW8FNlC.png"/>
 <img alt="synced" src="http://i.imgur.com/uPKhxLk.png" width="280" height="495"/>
 
 I may choose to continue this project in my spare time if others are interested and circumstances allow. No promises.
