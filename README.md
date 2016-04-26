@@ -9,9 +9,10 @@ This was written by myself (with the rest of my team working on the player) duri
 Our lead developer, [@luigiplr](https://github.com/luigiplr) of PopcornTime fame (read: lawsuits), tried to persuade the judges that the project was called Throw because it could "handle anything you **Throw** at it." While I was not involved in the naming, I suspect it may have had more to do with the way this project was **Throw**n together. 
 
 Now that that's out of the way, you probably want to see how it works.
+
 ![remote-needs-qr](http://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/357/082/datas/gallery.jpg)
 ![client-has-qr](http://challengepost-s3-challengepost.netdna-ssl.com/photos/production/software_photos/000/356/713/datas/gallery.jpg)
-![synced](http://i.imgur.com/uPKhxLk.png)
+<img alt="synced" src="http://i.imgur.com/uPKhxLk.png" width="280" height="495"/>
 
 I may choose to continue this project in my spare time if others are interested and circumstances allow. No promises.
 
